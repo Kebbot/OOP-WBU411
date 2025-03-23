@@ -5,217 +5,106 @@
 #include <vector>
 using namespace std;
 
+// Перегрузка операторов +, -, *, /
 class Point
 {
-	int x; 
+	int x;
 	int y;
-	int* mass;
 public:
-	Point() : x{ 0 }, y{ 0 }, mass{ nullptr }
-	{
-		std::cout << "Point default constructor" << std::endl;
-	}
-	Point(int pX, int pY) : x{ pX }, y{ pY },  mass { nullptr }
-	{
-		std::cout << "Point parameters constructor" << std::endl;
-	}
-	Point(int pX, int pY,int* mass1) : x{ pX }, y{ pY }, mass{ new int[pY] }
-	{
-		std::cout << "Point parameters2 constructor" << std::endl;
-		for (int i = 0; i < pY; i++)
-		{
-			mass[i] = mass1[i];
-		}
-	}
-};
-
-class Human
-{
-	string name;
-	int age;
-	string worker;
-	bool n;
-	static int count;
-	static const int maxHuman = 20;
-public:
-	Human() : Human{ "",0,"" } 
-	{ count++; /*cout << "Human default constructor : " << endl;*/ }
-	Human(string name, int age) : Human{ name,age,"" } 
-	{
-		//cout << "Human parameters constructor" << endl;
-	}
-	Human(string name, int age, string worker) :
-		name{ name }, age{ age }, worker{ worker }, n{ age >= 18 ? true :false }
-	{
-		//cout << "Human parameters2 constructor" << endl;
-	}
-	static void Say()
-	{
-		cout << "Human is " << count << endl;
-	}
-};
-
-int Human::count = 0;
-
-class Date
-{
-	int day;
-	int month;
-	int year;
-public:
-	Date(int day, int month, int year) :
-		day{ day }, month{ month }, year{ year }
-	{
-		cout << "Date constructed for " << this << endl;
-	}
-
-	Date():Date(1,1,1970){}
-
-	Date(int year) : Date(1,1,year) {}
-
-	~Date()
-	{
-		cout << "Date destructed for " << this << endl;
-	}
-
-	friend void displayDate(Date date);
-
-	void Print() const
-	{
-		cout << this->day << ' '
-			<< this->month << ' ' 
-			<< this->year << endl;
-	}
-
-	//void setDay(int dayP) { day = dayP; }
-	//void setMonth(int monthP) { month = monthP; }
-	//void setYear(int yearP) { year = yearP; }
-
-	Date& setDay(int dayP) { day = dayP;return *this; }
-	Date& setMonth(int monthP){ month = monthP;return *this; }
-	Date& setYear(int yearP){ year = yearP; return *this;}
-	int getDay() const { return day; }
-	int getMonth() const { return month; }
-	int getYear() const { return year; }
-	
-};
-
-void displayDate(Date date)
-{
-	cout << date.day << "." << date.month << "."
-		<< date.year << endl;
-}
-Date baseDate()
-{
-	return 2000;
-}
-
-class Fraction
-{
-	int numerator;
-	int denominator;
-public:
-	Fraction(int numerator, int denominator) :
-		numerator{ numerator }, denominator{ denominator }
-	{
-		cout << "Fraction constructed for " << this << endl;
-	}
-	Fraction():Fraction(1,1) {}
-
-	//ClassName(const ClassName& object)
-	Fraction(const Fraction& object) :
-		numerator{ object.numerator}, denominator{object.denominator}
+	Point() 
 	{ 
-		cout << "Fraction copy constructed for " << this << endl;
+		x = 1; 
+		y = 1;
+		//cout << "Был вызван конструктор по умолчанию " << this << endl;
+	} // конструктор по умолчанию
+	Point(int x, int y) : x{x}, y{y}
+	{
+		//cout << "Был вызван конструктор с параметрами " << this << endl;
+	} // конструктор с параметрами
+	Point(Point&& object) : x{ object.x }, y{ object.y }
+	{
+		object.x = 0;
+		object.y = 0;
+		//cout << "Был вызван конструктор перемещения " << this << endl;
 	}
+	// перегрузка оператора +
+	Point operator+(const Point& object1)
+	{
+		return Point(object1.x + x, object1.y + y);
+	}
+	friend Point operator+(const Point& object1, const Point& object2)
+	{
+		return Point(object1.x + object2.x, object1.y + object2.y);
+	}
+	// перегрузка оператора -
+	Point operator-(const Point& object1)
+	{
+		return Point(x - object1.x, y - object1.y);
+	}
+	friend Point operator-(const Point& object1, const Point& object2)
+	{
+		return Point(object1.x - object2.x, object1.y - object2.y);
+	}
+	// перегрузка оператора *
+	Point operator*(const Point& object1)
+	{
+		return Point(x * object1.x, y * object1.y);
+	}
+	friend Point operator*(const Point& object1, const Point& object2)
+	{
+		return Point(object1.x * object2.x, object1.y * object2.y);
+	}
+	// перегрузка оператора /
+	Point operator/(const Point& object1)
+	{
+		if(object1.x == 0 && object1.y != 0)
+			return Point(x / 1, y / object1.y);
+		else if(object1.y == 0 && object1.x != 0)
+			return Point(x / object1.x, y / 1);
+		else if(object1.y == 0 && object1.x == 0)
+			return Point(x / 1, y / 1);
 
-	~Fraction() { cout << "Fraction destructed for " << this << endl; }
+		return Point(x / object1.x, y / object1.y);
+	}
+	friend Point operator/(const Point& object1, const Point& object2)
+	{
+		if (object2.x == 0 && object2.y != 0)
+			return Point(object1.x / 1, object1.y / object2.y);
+		else if (object2.y == 0 && object2.x != 0)
+			return Point(object1.x / object2.x, object1.y / 1);
+		else if (object2.y == 0 && object2.x == 0)
+			return Point(object1.x / 1, object1.y / 1);
+
+		return Point(object1.x / object2.x, object1.y / object2.y);
+	}
+	// перегрузка оператора *
+	Point& operator=(const Point& object)
+	{
+		if (this == &object)
+		{
+			cout << "Присвоение запрещено" << endl;
+			return *this;
+		}
+		this->x = object.x;
+		this->y = object.y;
+		return *this;
+	}
 	void Print()
 	{
-		cout << '(' << numerator << '/' << denominator << ')' << endl;
+		cout << "x = " << x << ' ' << "y = " << y << endl;
+	}
+	~Point()
+	{
+		//cout << "Был вызван деструктор " << this << endl;
 	}
 };
 
-class DynArray
+Point PointFactory()
 {
-	int* arr;
-	int size;
-public:
-	DynArray(int sizeP) :
-		arr{ new int[sizeP] }, size{ sizeP }
-	{
-		cout << "DynArr constructed for "
-			<< size << " elements, for "
-			<< this << endl;
-	}
-	DynArray(const DynArray& object) :
-		arr{new int[object.size]}, size{object.size}
-	{
-		cout << "DynArr copy constructed for "
-			<< size << " elements, for "
-			<< this << endl;
-		for (size_t i = 0; i < size; i++)
-		{
-			arr[i] = object.arr[i];
-		}
-	}
-	int getElem(int idx) { return arr[idx]; }
-	DynArray& setElem(int idx, int val) { arr[idx] = val;return *this; }
-	DynArray& Print();
-	DynArray& randomize();
-	~DynArray()
-	{
-		delete[] arr;
-		cout << "DynArr destructed for "
-			<< size << " elements, for "
-			<< this << endl;
-	}
-};
-DynArray& DynArray::Print()
-{
-	for (size_t i = 0; i < size; i++)
-	{
-		cout << arr[i] << ' ';
-	}
-	cout << endl;
-	return *this;
-}
-DynArray& DynArray::randomize()
-{
-	for (size_t i = 0; i < size; i++)
-		arr[i] = rand() % 10;
-	return *this;
-}
-
-class ArrayP
-{
-	int size;
-	int* array;
-public:
-	explicit ArrayP(int size = 10);
-	~ArrayP();
-	int getSize()const;
-	int getValue(int index) const;
-	void setValue(int index, int value);
-	void display(int index) const;
-};
-ArrayP::ArrayP(int size)
-{
-	ArrayP::size = size;
-	array = new int[size];
-}
-ArrayP::~ArrayP() { delete[] array; }
-int ArrayP::getSize() const { return size; }
-int ArrayP::getValue(int index) const { return array[index]; }
-void ArrayP::setValue(int index, int value) { array[index] = value; }
-void ArrayP::display(int index) const { cout << array[index] << ' '; }
-void display(const ArrayP& array)
-{
-	for (size_t i = 0; i < array.getSize(); i++)
-	{
-		array.display(i);
-	}
-	cout << endl;
+	int x = rand() % 10;
+	int y = rand() % 10;
+	Point tmp{x,y};
+	return move(tmp);
 }
 
 int main()
@@ -226,7 +115,20 @@ int main()
 	SetConsoleCP(1251);
 	srand(time(NULL));
 
-	
+	/*Point p{ PointFactory()};
+	p.Print();*/
 
+	/*int&& rValueRef{ 2 + 3 };
+	int x{42};
+	int& lValueRef{ x };
+	int&& RvalueRef{ x + lValueRef };*/
+
+	vector<Point> arr;
+	for (size_t i = 0; i < 20; i++)
+	{
+		arr.push_back(PointFactory());
+		arr[i].Print();
+	}
 	return 0;
 }
+// след. тема = Заданные по умолчанию и удаленные методы.
