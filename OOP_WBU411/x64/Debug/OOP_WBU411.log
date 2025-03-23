@@ -1,0 +1,6 @@
+﻿  OOP_WBU411.cpp
+C:\Users\Admin\source\repos\OOP_WBU411\OOP_WBU411\OOP_WBU411.cpp(216,17): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\Admin\source\repos\OOP_WBU411\OOP_WBU411\OOP_WBU411.cpp(227,12): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
+C:\Users\Admin\source\repos\OOP_WBU411\OOP_WBU411\OOP_WBU411.cpp(234,27): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\Admin\source\repos\OOP_WBU411\OOP_WBU411\OOP_WBU411.cpp(234,19): warning C4267: аргумент: преобразование из "size_t" в "int"; возможна потеря данных
+  OOP_WBU411.vcxproj -> C:\Users\Admin\source\repos\OOP_WBU411\x64\Debug\OOP_WBU411.exe
