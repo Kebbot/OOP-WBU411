@@ -6,6 +6,7 @@
 #include <cassert>
 using namespace std;
 
+class RectangleP;
 // Перегрузка операторов +, -, *, /
 class Point
 {
@@ -22,17 +23,21 @@ public:
 	{
 		//cout << "Был вызван конструктор с параметрами " << this << endl;
 	} // конструктор с параметрами
-	Point(Point& object) = delete;
+	//Point(Point& object) = delete;
 	/*{
 		this->x = object.x;
 		this->y = object.y;
 	}*/
-	Point(Point&& object) : x{ object.x }, y{ object.y }
-	{
-		object.x = 0;
-		object.y = 0;
-		//cout << "Был вызван конструктор перемещения " << this << endl;
-	}
+	//Point(Point&& object) : x{ object.x }, y{ object.y }
+	//{
+	//	object.x = 0;
+	//	object.y = 0;
+	//	//cout << "Был вызван конструктор перемещения " << this << endl;
+	//}
+	Point& setX(int pX) { x = pX;return *this; }
+	Point& setY(int pY) { y = pY;return *this; }
+	int getX()const { return x; }
+	int getY()const { return y; }
 	// перегрузка оператора +
 	Point operator+(const Point& object1)
 	{
@@ -84,8 +89,8 @@ public:
 		return Point(object1.x / object2.x, object1.y / object2.y);
 	}
 	// перегрузка оператора =
-	Point& operator=(const Point& object) = delete;
-	/*{
+	Point& operator=(const Point& object)/* = delete;*/
+	{
 		if (this == &object)
 		{
 			cout << "Присвоение запрещено" << endl;
@@ -94,7 +99,7 @@ public:
 		this->x = object.x;
 		this->y = object.y;
 		return *this;
-	}*/
+	}
 	void Print()
 	{
 		cout << "x = " << x << ' ' << "y = " << y << endl;
@@ -103,8 +108,56 @@ public:
 	{
 		//cout << "Был вызван деструктор " << this << endl;
 	}
+
+	//Перегрузка оператора "Вывода"
+	friend ostream& operator<<(ostream& out, const Point& point);
+	//Перегрузка оператора "Ввода"
+	friend istream& operator>>(istream& in, Point& point);
+	
+	//дружественный класс
+	friend class RectangleP;
+};
+class RectangleP
+{
+	Point leftUpCorner;
+	Point rightDownCorner;
+public:
+	RectangleP() = default;
+	RectangleP(const Point& leftUpCornerP, int sideAP, int sideBP) :
+		leftUpCorner{ leftUpCornerP }, rightDownCorner{
+		leftUpCornerP.x + sideAP,leftUpCornerP.y + sideBP } {}
+	RectangleP(const Point& leftUpCornerP, const Point& rightDownCornerP) :
+		leftUpCorner{ leftUpCornerP }, rightDownCorner{ rightDownCornerP } {}
+
+	int getSideA()const { return rightDownCorner.x - leftUpCorner.x; }
+	int getSideB()const { return rightDownCorner.y - leftUpCorner.y; }
+
+	friend ostream& operator<<(ostream& out, const RectangleP& rectangle);
+
+
 };
 
+//Перегрузка оператора "Вывода"
+ostream& operator<<(ostream& out, const Point& point)
+{
+	out << "(" << point.x << "," << point.y << ")";
+	return out;
+}
+//Перегрузка оператора "Ввода"
+istream& operator>>(istream& in, Point& point)
+{
+	in >> point.x >> point.y;
+	return in;
+}
+ostream& operator<<(ostream& out, const RectangleP& rectangle)
+{
+	out << "[ " << rectangle.leftUpCorner << ' '
+		<< rectangle.getSideA() << " X "
+		<< rectangle.getSideB() << " "
+		<< rectangle.rightDownCorner << " ]";
+	return out;
+}
+/*
 Point PointFactory()
 {
 	int x = rand() % 10;
@@ -129,8 +182,7 @@ public:
 	template<class T1>
 	Point1& setX(T1 pX) = delete;
 
-	/*Point1& setY(double pY) = delete;
-	Point1& setX(double pX) = delete;*/
+	
 
 	void showPoint1() const
 	{
@@ -238,8 +290,8 @@ class MedalRow
 	char country[4];
 	int medals[3];
 public:
-	/*определяем константы для удобного 
-	и однозначного доступа к элементам массива*/
+	//определяем константы для удобного 
+	//и однозначного доступа к элементам массива
 	static const int GOLD{ 0 };
 	static const int SILVER{ 1 };
 	static const int BRONZE{ 2 };
@@ -382,10 +434,10 @@ public:
 		: sizeY{ sizeYP }, sizeX{ sizeXP },
 		data{ new int* [sizeYP] }
 	{
-		/*
-		* выделяем блок памяти для хранения всех элементов
-		* двумерного динамического массива.
-		*/
+		
+		//* выделяем блок памяти для хранения всех элементов
+		//* двумерного динамического массива.
+		
 		int* dataElements{ new int[sizeY * sizeX] };
 		for (int y{ 0 }; y < sizeY; ++y)
 		{
@@ -407,13 +459,13 @@ public:
 	}
 	~Dyn2DArrLinear()
 	{
-		/*
-		* адрес начала большого блока dataElements
-		* в конструкторе совпадает с адресом первой
-		* строки нашего двумерного динамического массива.
-		* Сперва освобождаем память из-под элементов
-		* массива, затем — память контейнера строк.
-		*/
+		
+		//* адрес начала большого блока dataElements
+		//* в конструкторе совпадает с адресом первой
+		//* строки нашего двумерного динамического массива.
+		//* Сперва освобождаем память из-под элементов
+		//* массива, затем — память контейнера строк.
+		
 		delete[] data[0];
 		delete[] data;
 	}
@@ -544,6 +596,260 @@ int cnt()
 {
 	static int counter{ 0 };
 	return counter++;
+}*/
+
+template<class T>
+T square(T number)
+{
+	T result = number * number;
+	return result;
+}
+template<class T>
+void sortP(T array[], size_t size)
+{
+	for (size_t k = size -1; k > 0; k--)
+	{
+		for (size_t j = 0; j < k; j++)
+		{
+			if (array[j] > array[j + 1])
+				swap(array[j], array[j + 1]);
+		}
+	}
+}
+template<class T>
+void display(T array[], size_t size)
+{
+	for (size_t i = 0; i < size; i++)
+	{
+		cout << array[i] << " ";
+	}
+	cout << endl;
+}
+
+template<class T>
+class ArrayP
+{
+	T* array;
+	size_t size;
+public:
+	ArrayP() = default;
+	ArrayP(T num, size_t size) : size{ size },
+		array{ new decltype(num)[size] }
+	{
+		if(sizeof(num) == 8)
+			for (size_t i = 0; i < size; i++)
+			{
+				array[i] = 0.5 + rand() % 50;
+			}
+		else if(sizeof(num) == 4)
+			for (size_t i = 0; i < size; i++)
+			{
+				array[i] = rand() % 50;
+			}
+		else
+			for (size_t i = 0; i < size; i++)
+			{
+				array[i] = 0;
+			}
+	}
+	~ArrayP()
+	{
+		delete[] array;
+	}
+	void display()
+	{
+		for (size_t i = 0; i < size; i++)
+		{
+			cout << array[i] << " ";
+		}
+		cout << endl << endl;
+	}
+};
+
+class StackP
+{
+	//Нижняя и верхняя границы стека
+	enum {EMPTY = -1, FULL = 20};
+
+	//Массив для хранения данных
+	char st[FULL + 1];
+
+	//указатель на вершину стека
+	int top;
+public:
+	//конструктор
+	StackP();
+
+	//Добавление элемента
+	void Push(char c);
+
+	//Извлечение элемента
+	char Pop();
+
+	//Очистка стека
+	void Clear();
+
+	//Проверка существования элементов в стеке
+	bool IsEmpty();
+
+	//проверка на переполнение стека
+	bool IsFull();
+
+	//Количество эелемнтов в стеке
+	int GetCount();
+};
+StackP::StackP()
+{
+	//изначально стек пуст
+	top = EMPTY;
+}
+void StackP::Clear()
+{
+	//Эффективная "очистка" стека
+	//данные в массиве всё еще существуют,
+	//НО функция класса, ориентированная на работу с вершиной стека
+	//будет игнорировать их.
+	top = EMPTY;
+}
+bool StackP::IsEmpty()
+{
+	//Пустой?
+	return top == EMPTY;
+}
+bool StackP::IsFull()
+{
+	//Полный?
+	return top == FULL;
+}
+int StackP::GetCount()
+{
+	//Количество присутствующих элементов в стеке
+	return top + 1;
+}
+void StackP::Push(char c)
+{
+	//Если в стеке есть место, то увеличиваем показатель
+	//на вершину стека и вставляем новый элемент
+	if (!IsFull())
+	{
+		st[++top] = c;
+	}
+}
+char StackP::Pop()
+{
+	//Если в стеке есть элементы, то возвращаем
+	//верхний и уменьшаем указатель "на вершину" стека
+	if (!IsEmpty())
+		return st[top--];
+	else //Если в стеке нет элементов
+		return 0;
+}
+
+
+class Queue
+{
+	//очередь
+	int* Wait;
+	// Максимальный размер очереди
+	int MaxQueueLength;
+	//Текущий размер очереди
+	int QueueLength;
+public:
+	//Конструктор
+	Queue(int m);
+	
+	//Деструктор
+	~Queue();
+	
+	//Добавление элемента
+	void Add(int c);
+
+	//Извлечение элемента
+	int Extract();
+
+	//Очистка очереди
+	void Clear();
+
+	//Проверка существования элементов в очереди
+	bool IsEmpty();
+
+	//Проверка на переполнение очереди
+	bool IsFull();
+
+	//Количество элементов в очереди
+	int GetCount();
+
+	//демонстрация очереди
+	void Show();
+};
+void Queue::Show()
+{
+	cout << "\n---------------------------------------\n";
+	for (int i = 0; i < QueueLength; i++)
+	{
+		cout << Wait[i] << ' ';
+	}
+	cout << "\n---------------------------------------\n";
+}
+Queue::~Queue()
+{
+	delete[] Wait;
+}
+Queue::Queue(int m)
+{
+	//получить размер
+	MaxQueueLength = m;
+	//создаем очередь
+	Wait = new int[MaxQueueLength];
+	QueueLength = 0;
+}
+void Queue::Clear()
+{
+	//Эффективная "Очистка" очереди
+	QueueLength = 0;
+}
+bool Queue::IsEmpty()
+{
+	//пустой?
+	return QueueLength == 0;
+}
+bool Queue::IsFull()
+{
+	//Полный?
+	return QueueLength == MaxQueueLength;
+}
+int Queue::GetCount()
+{
+	//Количество присутствующих в стеке эелемнтов
+	return QueueLength;
+}
+void Queue::Add(int c)
+{
+	//Если есть свободное место то увеличиваем кол-во значений
+	// и вствавляем новый элемент
+	if (!IsFull())
+		Wait[QueueLength++] = c;
+}
+int Queue::Extract()
+{
+	//Если в очереди есть элементы, то возвращаем тот,
+	//который вошел первым и сдвигаем очередь
+	if (!IsEmpty())
+	{
+		//запомнить первый
+		int temp = Wait[0];
+
+		//сдвинуть все эелементы
+		for (int i = 1; i < QueueLength; i++)
+			Wait[i - 1] = Wait[i];
+		// Уменьшить количество
+		QueueLength--;
+
+		//Вернуть первый(нулевой) элемент
+		return temp;
+	}
+	else
+		return -1; //Если в очереди нет элементов 
 }
 
 int main()
@@ -553,134 +859,40 @@ int main()
 	SetConsoleOutputCP(1251);
 	SetConsoleCP(1251);
 	srand(time(NULL));
-
-	const int maxCnt{ 5 };
-	Counter cnt1;
-	Counter cnt2{ 100 };
-	for (int i = 0; i < maxCnt; i++)
+	
+	Queue QU(25);
+	for (int i = 0; i < 5; i++)
 	{
-		cout << "cnt1: " << cnt1() << endl;
-		cout << "cnt2: " << cnt2() << endl;
+		QU.Add(rand() % 50);
 	}
-	cout << endl;
+	QU.Show();
+	cout << QU.Extract();
+	QU.Show();
 
-
-
-
-	//const int maxCnt{ 5 };
-	//// cnt1;
-	//for (int i = 0; i < maxCnt; i++)
-	//{
-	//	cout << cnt() << ' ';
+	//StackP ST;
+	//char c;
+	////Пока стек не заполниться
+	//while (!ST.IsFull()) {
+	//	//c = 30+rand() % (120-30);
+	//	cin >> c;
+	//	ST.Push(c);
 	//}
-	//cout << endl;
+	////Пока стек не освебодится
+	//while (c = ST.Pop()) {
+	//	cout << c << ' ';
+	//}
+	//cout << "\n\n";
 
-	/*cnt1.resetTo(10);
-	for (int i = 0; i < maxCnt; i++)
-	{
-		cout << cnt1() << ' ';
-	}
-	cout << endl;*/
+	/*ArrayP arrP1{ 1,10 };
+	ArrayP arrP2{ 1.1,10 };
+	arrP1.display();
+	arrP2.display();*/
 
-/*#define USER_INPUT 0;
-	int rows{ 3 };
-	int columns{ 3 };
-	int counter{ 1 };
-#if USER_INPUT == 1
-	cout << "Enter matrix rows count\n";
-	cin >> rows;
-	cout << "Enter matrix columns count\n";
-	cin >> columns;
-#endif // USER_INPUT == 1
-	Matrix matrix{ rows,columns };
-	for (int y = 0; y < rows; y++)
-	{
-		for (int x = 0; x < columns; x++)
-		{
-			matrix(y, x) = counter++;
-		}
-	}
-	matrix.print();
-	matrix.deleteColumn(2);
-	matrix.print();
+	/*RectangleP rect1{ {0,0},10,5 };
+	RectangleP rect2{ {0,0},{10,10} };
 
-	int* newColumn{ new int[columns] {11,22,33} };
-	matrix.addColumn(0, newColumn);
-	matrix.print();
-
-	matrix.deleteRow(2);
-	matrix.print();
-
-	int* newRow{ new int[rows] {111,222,333} };
-	matrix.addRow(2, newRow);
-	matrix.print();
-
-	delete[] newRow;
-	delete[] newColumn;*/
-
-	/*int rows{ 3 };
-	int columns{ 3 };
-	int counter{ 1 };
-	Dyn2DArrLinear arr2d{ rows, columns };
-	for (int y{ 0 }; y < rows; ++y)
-	{
-		for (int x{ 0 }; x < columns; ++x)
-		{
-			arr2d.data[y][x] = counter++;
-		}
-	}
-	arr2d.print();*/
-	/*int rows{ 3 };
-	int columns{ 3 };
-	int counter{ 1 };
-	Dyn2DArr arr2d{ rows, columns };
-	for (int y{ 0 }; y < rows; ++y)
-	{
-		for (int x{ 0 }; x < columns; ++x)
-		{
-			arr2d.data[y][x] = counter++;
-		}
-	}
-	arr2d.print();*/
-
-	/*MedalsTable mt1;
-	cout << "Medals table #1: \n";
-
-	mt1["RUS"][MedalRow::GOLD] = 14;
-	mt1["RUS"][MedalRow::SILVER] = 7;
-	mt1["USA"][MedalRow::GOLD] = 3;
-	mt1["USA"][MedalRow::BRONZE] = 5;
-	mt1["POL"][MedalRow::SILVER] = 2;
-	mt1["POL"][MedalRow::BRONZE] = 7;
-
-	mt1.Print();*/
-
-	/*const int size{10};
-	DynArray ar1{ arrayFactory(size) };
-	cout << "ar1 elements: ";
-	ar1.Print();
-
-	cout << "\nChange every ar1 element to it\'s square: " << endl;
-
-	for (int i{0}; i < size; i++)
-	{
-		ar1[i] *= ar1[i];
-		cout << "ar1[" << i << "] = " << ar1[i] << endl;
-	}
-	cout << "\n\n";
-	const DynArray ar2{ arrayFactory(size) };
-	cout << "ar2 elements: \n";
-	for (int i{ 0 }; i < size; i++)
-	{
-		cout << "ar2[" << i << "] = " << ar2[i] << endl;
-	}*/
-
-
+	cout << "Rectangle 1 " << rect1 <<
+		"\n\n" << "Rectangle 2 " << rect2 << "\n\n";*/
 	return 0;
 }
 
-/*
-* ReturnType operator()(){} //1
-* ReturnType operator()(ParamType_A param_A){} //2
-* ReturnType operator()(ParamType_A param_A, ParamType_B param_B){} //3
-*/
