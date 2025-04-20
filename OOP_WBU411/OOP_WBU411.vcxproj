@@ -129,7 +129,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Binary_Tree.cpp" />
+    <ClCompile Include="List_cast2.cpp" />
     <ClCompile Include="OOP_WBU411.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Binary_Tree.h" />
+    <ClInclude Include="List_cast2.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
