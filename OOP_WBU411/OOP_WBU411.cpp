@@ -3,171 +3,180 @@
 #include <string>
 #include <fstream>
 #include <vector>
-#include <cassert>
+#include <cassert>0
 #include <stdio.h>
-//#include "List_cast2.h"
-#include "Binary_Tree.h"
 using namespace std;
 
-struct Element
+/*//самостоятельный (глобавльный) класс А
+class A
 {
-	//Данные
-	char data;
-	//Адрес следующего элемента списка
-	Element* Next;
-};
-//Односвязный список
-class List_cast
-{
-	//Адрес головного элемента списка
-	Element* Head;
-	//Адрес концевого элемента списка
-	Element* Tail;
-	//Количество элементов списка
-	int Count;
 public:
-	//Конструктор
-	List_cast();
-	//Деструктор
-	~List_cast();
-	//Добавление элемента в список
-	//(Новый элемент становится последним)
-	void Add(char data);
-	//Удаление элемента списка
-	//(Удаляется головной элемент)
-	void Del();
-	//Удаление всего списка
-	void DelAll();
-	//Распечатка содержимого списка
-	//(Распечатка начинается с головного элемента)
-	void Print();
-	//Получение количества элементов,
-	//находящихся в списке
-	int GetCount();
+	int init(int);
+private:
+	class B
+	{
+	public:
+		friend class A; // объявление друга
+		B(int val = 0); // конструктор
+		int value; //поле класса
+		void mf( A&);
+		static int memb;
+		B* next; //указатель на собственный класс
+	};
+	B* object;
+	class Ref {
+		//pli имеет тип A::B*
+		B* pli;
+	};
+	class C
+	{
+		//pref имеет тип A::Ref*
+		Ref* pref;
+	};
 };
-List_cast::List_cast()
+int A::B::memb = 0;
+A::B::B(int val)
 {
-	//Изначально список пуст
-	Head = Tail = nullptr;
-	Count = 0;
+	//value = init(val);
 }
-List_cast::~List_cast()
+void A::B::mf(A& i1)
 {
-	//Вызов функции удаления
-	DelAll();
+	memb = i1.init(6);
 }
-int List_cast::GetCount()
-{
-	//Возвращаем количество элементов
-	return Count;
-}
-void List_cast::Add(char data)
-{
-	//создание нового элемента
-	Element* temp = new Element;
-	//заполнение данными
-	temp->data = data;
-	//следующий элемент отсутствует
-	temp->Next = nullptr;
-	//новый элемент становится последним элементом списка
-	//если он не первый добавленный
-	if (Head != nullptr) {
-		Tail->Next = temp;
-		Tail = temp;
-	}
-	//новый элемент становится единственным
-	//если он первый добавленный
-	else {
-		Head = Tail = temp;
-	}
-}
-void List_cast::Del()
-{
-	//запоминаем адрес головного элемента
-	Element* temp = Head;
-	//перебрасываем голову на следующий элемент
-	Head = Head->Next;
-	//удаляем бывший головной элемент
-	delete temp;
-}
-void List_cast::DelAll()
-{
-	//Пока еще есть элементы
-	while (Head != 0)
-		//Удаляем элементы по одному
-		Del();
-}
-void List_cast::Print()
-{
-	//запоминаем адрес головного элемента
-	Element* temp = Head;
-	//Пока еще есть элементы
-	while (temp != 0)
-	{
-		//Выводим данные
-		cout << temp->data << " ";
-		//Переходим на следующий элемент
-		temp = temp->Next;
-	}
-	cout << "\n\n";
-}
+*/
 
-//турнирная таблица
-Tree tournament;
-
-void Game(char Commands[][20], int N)
+class A
 {
-	int i, j;
-	int p1, p2; //Счет
-	//Каждая команда играет с каждой по 2 раза -
-	//дома и в гостях
-	int k;
-	Elem* temp;
-	for (k = 0; k < 2; k++)
+	// класс
+};
+class B
+{
+	A a1; // агрегация
+};
+class Agregate
+{
+	B B1; //композиция
+};
+
+//Наследование
+class Point //класс "точка"
+{
+protected:
+	int x;
+	int y;
+public:
+	Point() { x = 0; y = 0; };
+	int& getX() { return x; }
+	int& getY() { return y; }
+
+};
+class MyWindow : public Point
+{
+	int width;
+	int height;
+public:
+	MyWindow(int W,int H) : width{W}, height{H} {}
+	int& getWidth() { return width; }
+	int& getHeight() { return height; }
+	void MoveX(int DX) { x += DX; }
+	void MoveY(int DY) { y += DY; }
+	void Show()
 	{
-		for (i = 0; i < N - 1; i++)
-		{
-			for (j = i + 1; j < N; j++)
-			{
-				temp = new Elem;
-				if (k == 0)
-				{
-					//1 игра
-					strcpy_s(temp->Name, Commands[i]);
-					strcpy_s(temp->Opponent, Commands[j]);
-				}
-				else
-				{
-					//2 игра
-					strcpy_s(temp->Name, Commands[j]);
-					strcpy_s(temp->Opponent, Commands[i]);
-				}
-				p1 = rand() % 6;
-				p2 = rand() % 6;
-				if (p1 > p2)
-				{
-					temp->OwnerPoints = 3;
-					temp->OppPoints = 0;
-				}
-				else if (p1 == p2)
-				{
-					temp->OwnerPoints = 1;
-					temp->OppPoints = 1;
-				}
-				else
-				{
-					temp->OwnerPoints = 0;
-					temp->OppPoints = 3;
-				}
-				//Запись счета
-				sprintf_s(temp->Match, " %d : %d ", p1, p2);
-				cout << temp->Match << " " << p1 << " : " << p2 << endl;
-				//Добавление записи
-				tournament.Insert(temp);
-			}
-		}
+		cout << "______________________\n\n";
+		cout << "X = " << x << endl;
+		cout << "Y = " << y << endl;
+		cout << "W = " << width << endl;
+		cout << "H = " << height << endl;
+		cout << "______________________\n\n";
 	}
-}
+};
+
+// Множественное наследование
+class Roga
+{
+protected:
+	string color;
+	int wes;
+public:
+	Roga() { color = "Dirty"; wes = 20; }
+	Roga(string c, int w) : color{c}, wes{w} {}
+};
+class Kopyta
+{
+protected:
+	string forma;
+	int razmer;
+public:
+	Kopyta() { forma = "Big"; razmer = 10; }
+	Kopyta(string f,int r) : forma{f}, razmer{r} {}
+};
+
+class Los : public Roga, public Kopyta
+{
+public: 
+	string name;
+	Los(string name) : name{ name } {}
+	void DispalayInfo()
+	{
+		cout << "Name: " << name << endl;
+		cout << "Forma: " << forma << endl;
+		cout << "Color: " << color << endl;
+		cout << "Wes rogov: " << wes << endl;
+		cout << "Razmer kopyt: " << razmer << endl;
+	}
+};
+
+class Trnsport
+{
+protected:
+	string vid;
+	string sposob;
+	int countH;
+public:
+	Trnsport() : vid{ "NON" }, sposob{ "NON" }, countH{0} {}
+	Trnsport(string vid, string sposob, int countH) : 
+		vid{ vid }, sposob{ sposob }, countH{ countH } { }
+	void MoveT()
+	{
+		cout << "Транспорт движется: ";
+	}
+};
+class Auto : public Trnsport
+{
+	string color;
+	string mark;
+public: 
+	Auto() : color{ "NON" }, mark{"NON"} {}
+	Auto(string color, string mark) : color{ color }, mark{ mark } {}
+	Auto(string vid, string sposob, int countH, string color, string mark) : 
+		Trnsport(vid, sposob, countH), color{ color }, mark{ mark } { }
+	void Print()
+	{
+		MoveT();
+		cout << "по земле" << endl;
+	}
+};
+class Plane : public Trnsport
+{
+	string color;
+	string mark;
+public:
+	Plane() : color{ "NON" }, mark{ "NON" } {}
+	Plane(string color, string mark) : color{ color }, mark{ mark } {}
+	Plane(string vid, string sposob, int countH, string color, string mark) :
+		Trnsport(vid, sposob, countH), color{ color }, mark{ mark } {
+	}
+	void Print()
+	{
+		MoveT();
+		cout << "по земле и потом по воздуху" << endl;
+		cout << "Вид трансопрта: " << vid << endl;
+		cout << "Способ передвижения: " << sposob << endl;
+		cout << "Кол-во пассажиров: " << countH << endl;
+		cout << "Цвет: " << color << endl;
+		cout << "Модель: " << mark << endl;
+	}
+};
 
 int main()
 {
@@ -177,76 +186,75 @@ int main()
 	SetConsoleCP(1251);
 	srand(time(NULL));
 	
-	const int N = 4;
-	char Commands[4][20] =
-	{
-	"Arsenal",
-	"Liverpool",
-	"Lids United",
-	"Manchester United"
-	};
-	//Игра
-	Game(Commands, N);
-	//Вывод результатов
-	tournament.Print(tournament.GetRoot());
+	Plane P{ "Летательный", "Летает",10, "Красно-белый", "Кукурузник" };
+	P.Print();
+
+
+	/*Los l{ "Radoon" };
+	l.DispalayInfo();*/
+
+
+	/*// Создание объектов
+	MyWindow a{ 10,10 };
+	a.Show();
+
+	// Изменение параметров
+	a.getX() = 15;
+	a.getY() = 7;
+	a.getWidth() = 40;
+	a.getHeight() = 50;
+	a.Show();
+
+	// Сдвиг "окна"
+	a.MoveX(2);
+	a.MoveY(7);
+	a.Show();*/
 
 	
-	/*
-	//Создаем объект класса List
-	List_cast lst;
-	//Тестовая строка
-	char s[] = "Hello, World !!!\n";
-	//Выводим строку
-	cout << s << "\n\n";
-	//Определяем длину строки
-	int len = strlen(s);
-	//Загоняем строку в список
-	for (int i = 0; i < len; i++)
-		lst.Add(s[i]);
-	//Распечатываем содержимое списка
-	lst.Print();
-	//Удаляем три элемента списка
-	lst.Del();
-	lst.Del();
-	lst.Del();
-	//Распечатываем содержимое списка
-	lst.Print();*/
+	/*ofstream out{"Hello.txt", ios::out}; //поток для записи
+	if (!out.is_open())
+	{
+		//Проверка на открытый поток
+		cout << "Ошибка открытия!" << endl;
+	}
+	//запись в поток и передача в файл
+	out << "Привет потоки C++!" << endl << "Новая строка" << endl;
+	out.close(); //закрытие потока
 
-	/*List_cast2 L;
-	const int n = 10;
-	int a[n] = { 0,1,2,3,4,5,6,7,8,9 };
-	//Добавляем элементы, стоящие на четных
-	//индексах, в голову,
-	//на нечетных - в хвост
-	for (int i = 0; i < n; i++)
-		if (i % 2 == 0)
-			L.AddHead(a[i]);
-		else
-			L.AddTail(a[i]);
-	//Распечатка списка
-	cout << "List L:\n";
-	L.Print();
-	cout << endl;
-	//Вставка элемента в список
-	L.Insert();
-	//Распечатка списка
-	cout << "List L:\n"; L.Print();
-	//Распечатка 2-го и 8-го элементов списка
-	L.Print(2);
-	L.Print(8);
-	List_cast2 T;
-	//Копируем список
-	T = L;
-	//Распечатка копии
-	cout << "List T:\n";
-	T.Print();
-	//Складываем два списка
-	//(первый в перевернутом состоянии)
-	cout << "List Sum:\n";
-	List_cast2 Sum = -L + T;
-	//Распечатка списка
-	Sum.Print();*/
+
+	out.open("Hello.txt", ios::app); //открытие для дозаписи
+	if (!out.is_open())
+	{
+		//Проверка на открытый поток
+		cout << "Ошибка открытия!" << endl;
+	}
+	//запись в поток и передача в файл
+	out << "Дозапись с модификатором ios::app" << endl;
+	out.close(); //закрытие потока
+
+	ifstream in{ "Hello.txt", ios::in };
+	string str;
+	if (!in.is_open())
+	{
+		//Проверка на открытый поток
+		cout << "Ошибка открытия!" << endl;
+	}
+	while (getline(in, str))
+	{
+		cout << str << endl;
+	}*/
+	
 
 	return 0;
 }
-
+/* сначала ios::флаг_открытия
+* 
+* in - открыть только для чтения
+* out - открыть только для записи
+* ate - устанвоить указатель на конец файла
+* app - дозаписывает данные в конец файла
+* trunc - усечь файл до нулевой единицы
+* _Nocreate - если файл не существует, ошибка открытия
+* _Noreplace - если файл существует ошибка открытия
+* binary - открыть файл для двоичного обмена
+*/
